@@ -1,0 +1,9 @@
+vmail-admin version 0.1
+Copyright (C) 2011 Claudio Jolowicz <cj@dealloc.org>
+
+Manage virtual mailboxes and aliases in a MySQL database.
+
+vmail-admin comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+are welcome to redistribute it under certain conditions.  See the GNU
+General Public Licence for details.
+
