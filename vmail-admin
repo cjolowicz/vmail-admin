@@ -190,6 +190,7 @@ database_host=$default_database_host
 database_user=$default_database_user
 database_admin=$default_database_admin
 interactive=yes
+[ -t 1 ] || interactive=no
 while [ $# -gt 0 ] ; do
     option=$1
     shift
@@ -200,6 +201,7 @@ while [ $# -gt 0 ] ; do
         -v | --verbose) verbose=yes ;;
         -n | --dry-run) dry_run=yes ;;
         -f | --force) force=yes ;;
+        --interactive) interactive=yes ;;
         --non-interactive) interactive=no ;;
 
         --database-name)
@@ -1169,6 +1171,7 @@ case $command in
     users)                 do_list_users "$@" ;;
     aliases)               do_list_aliases "$@" ;;
     list | ls)             do_list "$@" ;;
+    query)                 db_user_query "$@" ;;
     help)                  usage ; exit 0 ;;
     *)                     bad_parameter "$command" ;;
 esac
