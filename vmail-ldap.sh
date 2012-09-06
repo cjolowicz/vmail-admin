@@ -402,14 +402,6 @@ ldap_delete () {
 }
 
 ##
-# Perform an LDAP delete operation as root.
-#
-ldap_root_delete () {
-    run_command \
-        ldapdelete "${ldap_root_options[@]}" "$@" >/dev/null
-}
-
-##
 # Perform an LDAP search operation.
 #
 ldap_search () {
