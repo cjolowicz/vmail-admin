@@ -494,7 +494,7 @@ do_create () {
 ##
 # Drop the database.
 #
-do_drop () {
+do_drop_database () {
     eval "$(parse_command_arguments '' "$@")"
 
     if [ $force = no -a $dry_run = no ] ; then
@@ -774,7 +774,7 @@ case $command in
     create)                do_create "$@" ;;
     create-schema)         do_create_schema "$@" ;;
     create-database)       do_create_database "$@" ;;
-    drop)                  do_drop "$@" ;;
+    drop-database)         do_drop_database "$@" ;;
     domains)               do_list_domains "$@" ;;
     users)                 do_list_users "$@" ;;
     aliases)               do_list_aliases "$@" ;;
