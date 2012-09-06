@@ -1,0 +1,13 @@
+<IfModule mod_authnz_ldap.c>
+<VirtualHost *:443>
+    ServerName acme.net
+
+    <Location />
+	AuthType Basic
+	AuthName "Restricted Area"
+	AuthBasicProvider ldap
+	AuthLDAPUrl ldap:///dc=acme,dc=net,ou=vmail,dc=example,dc=com
+	Require valid-user
+    </Location>
+</VirtualHost>
+</IfModule>
