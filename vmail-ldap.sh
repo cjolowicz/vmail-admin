@@ -404,6 +404,8 @@ ldap_add_if_not_exists () {
             $LDAP_ERROR_ALREADY_EXISTS) ;;
             *) error "$error" ;;
         esac
+    else
+        cat >/dev/null
     fi
 
     if [ $dry_run = yes -o $verbose = yes ] ; then
