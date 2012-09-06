@@ -146,8 +146,8 @@ missing_parameter () {
 # Build the DN for a given domain name.
 #
 build_domain_dn () {
-    dc=$1
-    dn=
+    dc="$1"
+    dn="$2"
 
     while : ; do
         dn="dc=${dc##*.}${dn:+,}${dn}"
@@ -521,9 +521,7 @@ do_list_domains () {
 #
 do_list_users () {
     eval "$(parse_command_arguments domain "$@")"
-    eval "$(build_domain_dn "$domain")"
-
-    domain_dn="${domain_dn},${vmail_dn}"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
     ldap_search -b "ou=people,${domain_dn}" -s one 'uid' |
     egrep '^uid: ' | cut -c6-
@@ -534,9 +532,7 @@ do_list_users () {
 #
 do_list_aliases () {
     eval "$(parse_command_arguments domain "$@")"
-    eval "$(build_domain_dn "$domain")"
-
-    domain_dn="${domain_dn},${vmail_dn}"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
     ldap_search -b "ou=mailGroups,${domain_dn}" -s one 'mail' 'mgrpRFC822MailMember' |
     while read line ; do
@@ -558,9 +554,7 @@ do_list_aliases () {
 #
 do_list () {
     eval "$(parse_command_arguments domain "$@")"
-    eval "$(build_domain_dn "$domain")"
-
-    domain_dn="${domain_dn},${vmail_dn}"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
     ldap_search -b "ou=people,${domain_dn}" -s one 'uid'
     ldap_search -b "ou=mailGroups,${domain_dn}" -s one 'mail'
@@ -571,9 +565,7 @@ do_list () {
 #
 do_add_domain () {
     eval "$(parse_command_arguments domain "$@")"
-    eval "$(build_domain_dn "$domain")"
-
-    domain_dn="${domain_dn},${vmail_dn}"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
     ldap_add <<EOF
 dn: ${domain_dn}
@@ -604,9 +596,8 @@ do_add_user () {
     domain="${user##*@}"
     user="${user%@*}"
 
-    eval "$(build_domain_dn "$domain")"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    domain_dn="${domain_dn},${vmail_dn}"
     user_dn="uid=${user},ou=people,${domain_dn}"
 
     read_password
@@ -651,9 +642,8 @@ do_add_alias () {
     domain="${alias##*@}"
     alias="${alias%@*}"
 
-    eval "$(build_domain_dn "$domain")"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    domain_dn="${domain_dn},${vmail_dn}"
     alias_dn="mail=${alias},ou=mailGroups,${domain_dn}"
 
     ldap_add <<EOF 2>/dev/null ||
@@ -697,9 +687,8 @@ do_password () {
     domain="${user##*@}"
     user="${user%@*}"
 
-    eval "$(build_domain_dn "$domain")"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    domain_dn="${domain_dn},${vmail_dn}"
     user_dn="uid=${user},ou=people,${domain_dn}"
 
     read_password
@@ -722,9 +711,7 @@ do_remove_domain () {
     fi
 
     eval "$(parse_command_arguments domain "$@")"
-    eval "$(build_domain_dn "$domain")"
-
-    domain_dn="${domain_dn},${vmail_dn}"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
     ldap_delete -r "$domain_dn"
 }
@@ -742,9 +729,8 @@ do_remove_user () {
     domain="${user##*@}"
     user="${user%@*}"
 
-    eval "$(build_domain_dn "$domain")"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    domain_dn="${domain_dn},${vmail_dn}"
     user_dn="uid=${user},ou=people,${domain_dn}"
 
     ldap_delete "$user_dn"
@@ -763,9 +749,8 @@ do_remove_alias () {
     domain="${alias##*@}"
     alias="${alias%@*}"
 
-    eval "$(build_domain_dn "$domain")"
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    domain_dn="${domain_dn},${vmail_dn}"
     alias_dn="mail=${alias},ou=mailGroups,${domain_dn}"
 
     if [ -z "$user" ] ; then
