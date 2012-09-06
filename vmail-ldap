@@ -22,7 +22,8 @@ set -e
 
 prog=$(basename $0)
 VERSION=0.1
-confdir=/usr/local/etc
+confdir=/etc
+pkgconfdir=$confdir/$prog
 default_ldap_options=(-H ldapi:/// -xW)
 default_ldap_root_options=(-H ldapi:/// -Y external)
 minimum_password_length=6
@@ -75,7 +76,7 @@ options:
         --ldap-root-option OPT            LDAP option for operations as root
         --non-interactive                 read password from stdin
 
-The program reads $confdir/$prog.conf if it exists. Each line in this file
+The program reads $pkgconfdir/$prog.conf if it exists. Each line in this file
 may contain a long option without the leading hyphens. If the option takes
 an argument, they must be separated by an \`=' without whitespace. Empty
 lines and lines starting with a \`#' are ignored.
@@ -225,8 +226,8 @@ parse_command_arguments () {
 #
 parse_configuration_file () {
     printf 'configuration_options=()\n'
-    if [ -f "$confdir/$prog.conf" ] ; then
-        sed '/^[ \t]*\(#\|$\)/d' "$confdir/$prog.conf" |
+    if [ -f "$pkgconfdir/$prog.conf" ] ; then
+        sed '/^[ \t]*\(#\|$\)/d' "$pkgconfdir/$prog.conf" |
         while read line ; do
             case $line in
                 *'='*) printf 'configuration_options+=(--%q %q)\n' \
