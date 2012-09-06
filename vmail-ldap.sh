@@ -151,11 +151,11 @@ iterate_domain_dn () {
     o=
 
     while [ -n "$arg" ] ; do
-	dc="${arg##*.}"
+        dc="${arg##*.}"
         dn="dc=${dc}${dn:+,}${dn}"
-	o="${dc}${o:+.}${o}"
+        o="${dc}${o:+.}${o}"
 
-	printf 'domain_dn=%q domain_dc=%q domain_o=%q\n' "$dn" "${dc}" "${o}"
+        printf 'domain_dn=%q domain_dc=%q domain_o=%q\n' "$dn" "${dc}" "${o}"
 
         case $arg in
             *.*) arg=${arg%.*} ;;
@@ -215,7 +215,7 @@ parse_command_arguments () {
                 printf '%s+=(%q)\n' "$parameter" "$value"
             done
 
-	    set --
+            set --
 
             break
         fi
@@ -541,13 +541,13 @@ do_list_aliases () {
     while read line ; do
         case $line in
             mail:*)
-		alias=${line#*: }
-		;;
+                alias=${line#*: }
+                ;;
 
             mgrpRFC822MailMember:*)
-		user=${line#*: }
-		echo -e "$alias\t$user"
-		;;
+                user=${line#*: }
+                echo -e "$alias\t$user"
+                ;;
         esac
     done
 }
@@ -571,8 +571,8 @@ do_add_domain () {
 
     iterate_domain_dn "$domain" "$vmail_dn" |
     while read line ; do
-	eval "$line"
-	ldap_add <<EOF
+        eval "$line"
+        ldap_add <<EOF
 dn: ${domain_dn}
 objectClass: organization
 objectClass: dcObject
