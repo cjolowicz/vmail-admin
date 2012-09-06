@@ -2,10 +2,7 @@
 
 set -e
 
-opts=()
-case $1 in -v | --verbose)
-    opts+=(--verbose) ;;
-esac
+opts=("$@")
 
 vmail-ldap "${opts[@]}" -f drop-database
 vmail-ldap "${opts[@]}" create-database
