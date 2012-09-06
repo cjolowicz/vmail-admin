@@ -143,21 +143,32 @@ missing_parameter () {
 }
 
 ##
+# Iterate over the DNs leading to the given domain name.
+#
+iterate_domain_dn () {
+    arg="$1"
+    dn="$2"
+    o=
+
+    while [ -n "$arg" ] ; do
+	dc="${arg##*.}"
+        dn="dc=${dc}${dn:+,}${dn}"
+	o="${dc}${o:+.}${o}"
+
+	printf 'domain_dn=%q domain_dc=%q domain_o=%q\n' "$dn" "${dc}" "${o}"
+
+        case $arg in
+            *.*) arg=${arg%.*} ;;
+              *) arg= ;;
+        esac
+    done
+}
+
+##
 # Build the DN for a given domain name.
 #
 build_domain_dn () {
-    dc="$1"
-    dn="$2"
-
-    while : ; do
-        dn="dc=${dc##*.}${dn:+,}${dn}"
-        case $dc in
-            *.*) dc=${dc%.*} ;;
-              *) break ;;
-        esac
-    done
-
-    printf 'domain_dn=%q\ndomain_dc=%q\n' "$dn" "$dc"
+    iterate_domain_dn "$@" | tail -n1
 }
 
 ##
@@ -565,16 +576,22 @@ do_list () {
 #
 do_add_domain () {
     eval "$(parse_command_arguments domain "$@")"
-    eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    ldap_add <<EOF
+    iterate_domain_dn "$domain" "$vmail_dn" |
+    while read line ; do
+	eval "$line"
+	ldap_add <<EOF
 dn: ${domain_dn}
 objectClass: organization
 objectClass: dcObject
 objectClass: top
-o: ${domain}
+o: ${domain_o}
 dc: ${domain_dc}
+EOF
+    done
 
+    eval "$(build_domain_dn "$domain" "$vmail_dn")"
+    ldap_add <<EOF
 dn: ou=people,${domain_dn}
 objectClass: organizationalUnit
 objectClass: top
