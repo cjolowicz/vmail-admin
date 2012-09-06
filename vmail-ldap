@@ -501,11 +501,7 @@ do_drop () {
         error "Use \`--force' to actually drop the database."
     fi
 
-    for domain in $(do_list_domains) ; do
-        do_remove_domain "$domain"
-    done
-
-    ldap_delete "${vmail_dn}" || return 0
+    ldap_delete -r "${vmail_dn}" || return 0
 }
 
 ##
@@ -710,17 +706,7 @@ do_remove_domain () {
     eval "$(parse_command_arguments domain "$@")"
     domain_dn="o=${domain},${vmail_dn}"
 
-    do_list_aliases "$domain" | awk '{print $1}' | sort | uniq | while read alias ; do
-        do_remove_alias "${alias}@${domain}"
-    done
-
-    for user in $(do_list_users "$domain") ; do
-        do_remove_user "${user}@${domain}"
-    done
-
-    ldap_delete "ou=aliases,$domain_dn"
-    ldap_delete "ou=users,$domain_dn"
-    ldap_delete "$domain_dn"
+    ldap_delete -r "$domain_dn"
 }
 
 ##
