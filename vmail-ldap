@@ -525,7 +525,7 @@ do_list_users () {
     eval "$(parse_command_arguments domain "$@")"
     domain_dn="o=${domain},${vmail_dn}"
 
-    ldap_search -b "ou=people,${domain_dn}" -s one 'uid' |
+    ldap_search -b "ou=users,${domain_dn}" -s one 'uid' |
     egrep '^uid: ' | cut -c6-
 }
 
@@ -536,7 +536,7 @@ do_list_aliases () {
     eval "$(parse_command_arguments domain "$@")"
     domain_dn="o=${domain},${vmail_dn}"
 
-    ldap_search -b "ou=groups,${domain_dn}" -s one 'mail' 'mgrpRFC822MailMember' |
+    ldap_search -b "ou=aliases,${domain_dn}" -s one 'mail' 'mgrpRFC822MailMember' |
     while read line ; do
         case $line in
             mail:*)
@@ -558,8 +558,8 @@ do_list () {
     eval "$(parse_command_arguments domain "$@")"
     domain_dn="o=${domain},${vmail_dn}"
 
-    ldap_search -b "ou=people,${domain_dn}" -s one 'uid'
-    ldap_search -b "ou=groups,${domain_dn}" -s one 'mail'
+    ldap_search -b "ou=users,${domain_dn}" -s one 'uid'
+    ldap_search -b "ou=aliases,${domain_dn}" -s one 'mail'
 }
 
 ##
@@ -575,15 +575,15 @@ objectClass: organization
 objectClass: top
 o: ${domain}
 
-dn: ou=people,${domain_dn}
+dn: ou=users,${domain_dn}
 objectClass: organizationalUnit
 objectClass: top
-ou: people
+ou: users
 
-dn: ou=groups,${domain_dn}
+dn: ou=aliases,${domain_dn}
 objectClass: organizationalUnit
 objectClass: top
-ou: groups
+ou: aliases
 EOF
 }
 
@@ -597,7 +597,7 @@ do_add_user () {
     user="${user%@*}"
 
     domain_dn="o=${domain},${vmail_dn}"
-    user_dn="uid=${user},ou=people,${domain_dn}"
+    user_dn="uid=${user},ou=users,${domain_dn}"
 
     read_password
 
@@ -642,7 +642,7 @@ do_add_alias () {
     alias="${alias%@*}"
 
     domain_dn="o=${domain},${vmail_dn}"
-    alias_dn="mail=${alias},ou=groups,${domain_dn}"
+    alias_dn="mail=${alias},ou=aliases,${domain_dn}"
 
     ldap_add <<EOF 2>/dev/null ||
 dn: ${alias_dn}
@@ -686,7 +686,7 @@ do_password () {
     user="${user%@*}"
 
     domain_dn="o=${domain},${vmail_dn}"
-    user_dn="uid=${user},ou=people,${domain_dn}"
+    user_dn="uid=${user},ou=users,${domain_dn}"
 
     read_password
 
@@ -718,8 +718,8 @@ do_remove_domain () {
         do_remove_user "${user}@${domain}"
     done
 
-    ldap_delete "ou=groups,$domain_dn"
-    ldap_delete "ou=people,$domain_dn"
+    ldap_delete "ou=aliases,$domain_dn"
+    ldap_delete "ou=users,$domain_dn"
     ldap_delete "$domain_dn"
 }
 
@@ -737,7 +737,7 @@ do_remove_user () {
     user="${user%@*}"
 
     domain_dn="o=${domain},${vmail_dn}"
-    user_dn="uid=${user},ou=people,${domain_dn}"
+    user_dn="uid=${user},ou=users,${domain_dn}"
 
     ldap_delete "$user_dn"
 }
@@ -756,7 +756,7 @@ do_remove_alias () {
     alias="${alias%@*}"
 
     domain_dn="o=${domain},${vmail_dn}"
-    alias_dn="mail=${alias},ou=groups,${domain_dn}"
+    alias_dn="mail=${alias},ou=aliases,${domain_dn}"
 
     if [ -z "$user" ] ; then
         ldap_delete "$alias_dn"
