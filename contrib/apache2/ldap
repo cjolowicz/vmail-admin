@@ -6,7 +6,7 @@
 	AuthType Basic
 	AuthName "Restricted Area"
 	AuthBasicProvider ldap
-	AuthLDAPUrl ldap:///dc=acme,dc=net,ou=vmail,dc=example,dc=com
+	AuthLDAPUrl ldap:///ou=people,dc=acme,dc=net,ou=vmail,dc=example,dc=com
 	Require valid-user
     </Location>
 </VirtualHost>
