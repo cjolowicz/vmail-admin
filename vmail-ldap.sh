@@ -511,7 +511,7 @@ do_drop_database () {
 do_list_domains () {
     eval "$(parse_command_arguments '' "$@")"
 
-    ldap_search -b "${vmail_dn}" -s one 'o' |
+    ldap_search -b "${vmail_dn}" -s sub 'o' |
     egrep '^o: ' | cut -c4-
 }
 
@@ -520,7 +520,9 @@ do_list_domains () {
 #
 do_list_users () {
     eval "$(parse_command_arguments domain "$@")"
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
 
     ldap_search -b "ou=users,${domain_dn}" -s one 'uid' |
     egrep '^uid: ' | cut -c6-
@@ -531,7 +533,9 @@ do_list_users () {
 #
 do_list_aliases () {
     eval "$(parse_command_arguments domain "$@")"
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
 
     ldap_search -b "ou=aliases,${domain_dn}" -s one 'mail' 'mgrpRFC822MailMember' |
     while read line ; do
@@ -553,7 +557,9 @@ do_list_aliases () {
 #
 do_list () {
     eval "$(parse_command_arguments domain "$@")"
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
 
     ldap_search -b "ou=users,${domain_dn}" -s one 'uid'
     ldap_search -b "ou=aliases,${domain_dn}" -s one 'mail'
@@ -564,13 +570,17 @@ do_list () {
 #
 do_add_domain () {
     eval "$(parse_command_arguments domain "$@")"
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
 
     ldap_add <<EOF
 dn: ${domain_dn}
 objectClass: organization
+objectClass: dcObject
 objectClass: top
 o: ${domain}
+dc: ${domain_dc}
 
 dn: ou=users,${domain_dn}
 objectClass: organizationalUnit
@@ -593,7 +603,9 @@ do_add_user () {
     domain="${user##*@}"
     user="${user%@*}"
 
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
     user_dn="uid=${user},ou=users,${domain_dn}"
 
     read_password
@@ -638,7 +650,9 @@ do_add_alias () {
     domain="${alias##*@}"
     alias="${alias%@*}"
 
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
     alias_dn="mail=${alias},ou=aliases,${domain_dn}"
 
     ldap_add <<EOF 2>/dev/null ||
@@ -682,7 +696,9 @@ do_password () {
     domain="${user##*@}"
     user="${user%@*}"
 
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
     user_dn="uid=${user},ou=users,${domain_dn}"
 
     read_password
@@ -705,7 +721,9 @@ do_remove_domain () {
     fi
 
     eval "$(parse_command_arguments domain "$@")"
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
 
     ldap_delete -r "$domain_dn"
 }
@@ -723,7 +741,9 @@ do_remove_user () {
     domain="${user##*@}"
     user="${user%@*}"
 
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
     user_dn="uid=${user},ou=users,${domain_dn}"
 
     ldap_delete "$user_dn"
@@ -742,7 +762,9 @@ do_remove_alias () {
     domain="${alias##*@}"
     alias="${alias%@*}"
 
-    domain_dn="o=${domain},${vmail_dn}"
+    eval "$(build_domain_dn "$domain")"
+
+    domain_dn="${domain_dn},${vmail_dn}"
     alias_dn="mail=${alias},ou=aliases,${domain_dn}"
 
     if [ -z "$user" ] ; then
