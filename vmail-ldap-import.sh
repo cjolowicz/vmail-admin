@@ -10,6 +10,7 @@ vmail-ldap "${opts[@]}" create-database
 vmail-admin domains |
 while read domain ; do
     echo "==> $domain <=="
+    echo
     vmail-ldap "${opts[@]}" add $domain
 
     vmail-admin query "\
