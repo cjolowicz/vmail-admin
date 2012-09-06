@@ -20,7 +20,7 @@
 
 set -e
 
-program=$(basename $0)
+program=vmail-admin
 VERSION=0.1
 confdir=/etc
 pkgconfdir=$confdir/$program
