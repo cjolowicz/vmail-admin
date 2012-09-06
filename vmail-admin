@@ -2,7 +2,7 @@
 #
 # vmail-admin - Manage virtual mailboxes and aliases in a MySQL database.
 #
-# Copyright (C) 2011 Claudio <cj@dealloc.org>
+# Copyright (C) 2012 Claudio Jolowicz <cj@dealloc.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ minimum_password_nonalpha=1
 version () {
     echo "\
 $prog version $VERSION
-Copyright (C) 2011 Claudio Jolowicz <cj@dealloc.org>
+Copyright (C) 2012 Claudio Jolowicz <cj@dealloc.org>
 
 Manage virtual mailboxes and aliases in a MySQL database.
 
@@ -87,6 +87,7 @@ options:
         --mysql-option       OPT   command-line option for mysql(1)
         --mysql-user-option  OPT   command-line option for mysql(1)
         --mysql-admin-option OPT   command-line option for mysql(1)
+        --interactive              prompt for, and confirm, password
         --non-interactive          read password from stdin
 
 The program reads $confdir/$prog.conf if it exists. Each line in this file
@@ -1172,7 +1173,8 @@ case $command in
     aliases)               do_list_aliases "$@" ;;
     list | ls)             do_list "$@" ;;
     query)                 db_user_query "$@" ;;
-    help)                  usage ; exit 0 ;;
+    help)                  usage ;;
+    version)               version ;;
     *)                     bad_parameter "$command" ;;
 esac
 
