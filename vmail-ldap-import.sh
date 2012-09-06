@@ -7,7 +7,7 @@ case $1 in -v | --verbose)
     opts+=(--verbose) ;;
 esac
 
-vmail-ldap "${opts[@]}" -f drop
+vmail-ldap "${opts[@]}" -f drop-database
 vmail-ldap "${opts[@]}" create-database
 
 vmail-admin domains |

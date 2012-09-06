@@ -54,7 +54,7 @@ usage () {
 Usage: $program [options] create
        $program [options] create-schema
        $program [options] create-database
-       $program [options] drop
+       $program [options] drop-database
        $program [options] domains
        $program [options] users     DOMAIN
        $program [options] aliases   DOMAIN
