@@ -20,10 +20,11 @@
 
 set -e
 
+package=vmail-admin
 program=vmail-admin
 VERSION=0.1
 confdir=/etc
-pkgconfdir=$confdir/$program
+pkgconfdir=$confdir/$package
 default_database_name=mail
 default_database_host=127.0.0.1
 default_database_user=mail

@@ -20,10 +20,11 @@
 
 set -e
 
+package=vmail-admin
 program=vmail-ldap
 VERSION=0.1
 confdir=/etc
-pkgconfdir=$confdir/$program
+pkgconfdir=$confdir/$package
 default_ldap_options=(-H ldapi:/// -xW)
 default_ldap_root_options=(-H ldapi:/// -Y external)
 minimum_password_length=6
