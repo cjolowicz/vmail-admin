@@ -23,6 +23,7 @@ set -e
 prog=$(basename $0)
 VERSION=0.1
 confdir=/etc
+pkgconfdir=$confdir/$prog
 default_database_name=mail
 default_database_host=127.0.0.1
 default_database_user=mail
@@ -90,7 +91,7 @@ options:
         --interactive              prompt for, and confirm, password
         --non-interactive          read password from stdin
 
-The program reads $confdir/$prog.conf if it exists. Each line in this file
+The program reads $pkgconfdir/$prog.conf if it exists. Each line in this file
 may contain a long option without the leading hyphens. If the option takes
 an argument, they must be separated by an \`=' without whitespace. Empty
 lines and lines starting with a \`#' are ignored.
@@ -160,8 +161,8 @@ missing_parameter () {
 #
 parse_configuration_file () {
     printf 'configuration_options=()\n'
-    if [ -f "$confdir/$prog.conf" ] ; then
-        sed '/^[ \t]*\(#\|$\)/d' "$confdir/$prog.conf" |
+    if [ -f "$pkgconfdir/$prog.conf" ] ; then
+        sed '/^[ \t]*\(#\|$\)/d' "$pkgconfdir/$prog.conf" |
         while read line ; do
             case $line in
                 *'='*) printf 'configuration_options+=(--%q %q)\n' \
@@ -291,14 +292,14 @@ shift
 
 if [ -n "$mysql_user_config" ] ; then
     if [ "${mysql_user_config::0}" != / ] ; then
-        mysql_user_config=$confdir/"$mysql_user_config"
+        mysql_user_config=$pkgconfdir/"$mysql_user_config"
     fi
     mysql_user_options=(--defaults-file="$mysql_user_config" "${mysql_user_options[@]}")
 fi
 
 if [ -n "$mysql_admin_config" ] ; then
     if [ "${mysql_admin_config::0}" != / ] ; then
-        mysql_admin_config=$confdir/"$mysql_admin_config"
+        mysql_admin_config=$pkgconfdir/"$mysql_admin_config"
     fi
     mysql_admin_options=(--defaults-file="$mysql_admin_config" "${mysql_admin_options[@]}")
 fi
