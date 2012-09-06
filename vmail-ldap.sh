@@ -30,6 +30,8 @@ default_ldap_root_options=(-H ldapi:/// -Y external)
 minimum_password_length=6
 minimum_password_nonalpha=1
 
+LDAP_ERROR_ALREADY_EXISTS=68
+
 ##
 # Print the version.
 #
@@ -386,6 +388,30 @@ ldap_add () {
 }
 
 ##
+# Perform an LDAP add operation. Do not fail if the entry exists.
+#
+ldap_add_if_not_exists () {
+    if [ $dry_run = yes -o $verbose = yes ] ; then
+        echo ldapadd "${ldap_options[@]}" "$@" '<<EOF' >&2
+        tee /dev/stderr
+    else
+        cat
+    fi |
+
+    if [ $dry_run = no ] ; then
+        error=$(ldapadd "${ldap_options[@]}" "$@" 2>&1 >/dev/null) ||
+        case $? in
+            $LDAP_ERROR_ALREADY_EXISTS) ;;
+            *) error "$error" ;;
+        esac
+    fi
+
+    if [ $dry_run = yes -o $verbose = yes ] ; then
+        echo 'EOF' >&2
+    fi
+}
+
+##
 # Perform an LDAP add operation as root.
 #
 ldap_root_add () {
@@ -572,7 +598,7 @@ do_add_domain () {
     iterate_domain_dn "$domain" "$vmail_dn" |
     while read line ; do
         eval "$line"
-        ldap_add <<EOF
+        ldap_add_if_not_exists <<EOF
 dn: ${domain_dn}
 objectClass: organization
 objectClass: dcObject
@@ -583,7 +609,7 @@ EOF
     done
 
     eval "$(build_domain_dn "$domain" "$vmail_dn")"
-    ldap_add <<EOF
+    ldap_add_if_not_exists <<EOF
 dn: ou=people,${domain_dn}
 objectClass: organizationalUnit
 objectClass: top
@@ -655,16 +681,12 @@ do_add_alias () {
 
     alias_dn="mail=${alias},ou=mailGroups,${domain_dn}"
 
-    ldap_add <<EOF 2>/dev/null ||
+    ldap_add_if_not_exists <<EOF
 dn: ${alias_dn}
 mail: ${alias}
 objectClass: mailGroup
 objectClass: top
 EOF
-    case $? in
-        68) ;; # already exists
-         *) error "cannot add alias to LDAP" ;;
-    esac
 
     (
         echo "dn: ${alias_dn}"
