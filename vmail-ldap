@@ -20,10 +20,10 @@
 
 set -e
 
-prog=$(basename $0)
+program=$(basename $0)
 VERSION=0.1
 confdir=/etc
-pkgconfdir=$confdir/$prog
+pkgconfdir=$confdir/$program
 default_ldap_options=(-H ldapi:/// -xW)
 default_ldap_root_options=(-H ldapi:/// -Y external)
 minimum_password_length=6
@@ -34,12 +34,12 @@ minimum_password_nonalpha=1
 #
 version () {
     echo "\
-$prog version $VERSION
+$program version $VERSION
 Copyright (C) 2012 Claudio Jolowicz <cj@dealloc.org>
 
 Manage virtual mailboxes and aliases in LDAP.
 
-$prog comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
+$program comes with ABSOLUTELY NO WARRANTY.  This is free software, and you
 are welcome to redistribute it under certain conditions.  See the GNU
 General Public Licence for details.
 "
@@ -51,19 +51,19 @@ General Public Licence for details.
 usage () {
     version
     echo "\
-Usage: $prog [options] create
-       $prog [options] create-schema
-       $prog [options] create-database
-       $prog [options] drop
-       $prog [options] domains
-       $prog [options] users     DOMAIN
-       $prog [options] aliases   DOMAIN
-       $prog [options] list      DOMAIN
-       $prog [options] add       DOMAIN | USER
-       $prog [options] remove    DOMAIN | USER
-       $prog [options] password  USER
-       $prog [options] alias     ALIAS USER..
-       $prog [options] unalias   ALIAS [USER]
+Usage: $program [options] create
+       $program [options] create-schema
+       $program [options] create-database
+       $program [options] drop
+       $program [options] domains
+       $program [options] users     DOMAIN
+       $program [options] aliases   DOMAIN
+       $program [options] list      DOMAIN
+       $program [options] add       DOMAIN | USER
+       $program [options] remove    DOMAIN | USER
+       $program [options] password  USER
+       $program [options] alias     ALIAS USER..
+       $program [options] unalias   ALIAS [USER]
 
 options:
 
@@ -76,7 +76,7 @@ options:
         --ldap-root-option OPT            LDAP option for operations as root
         --non-interactive                 read password from stdin
 
-The program reads $pkgconfdir/$prog.conf if it exists. Each line in this file
+The program reads $pkgconfdir/$program.conf if it exists. Each line in this file
 may contain a long option without the leading hyphens. If the option takes
 an argument, they must be separated by an \`=' without whitespace. Empty
 lines and lines starting with a \`#' are ignored.
@@ -87,7 +87,7 @@ lines and lines starting with a \`#' are ignored.
 # Print an error message and exit.
 #
 error () {
-    echo "$prog: $*" >&2
+    echo "$program: $*" >&2
     exit 1
 }
 
@@ -95,22 +95,22 @@ error () {
 # Print a notice.
 #
 notice () {
-    echo "$prog: $*" >&2
+    echo "$program: $*" >&2
 }
 
 ##
 # Print an informational message.
 #
 verbose () {
-    [ $verbose = no ] || echo "$prog: $*" >&2
+    [ $verbose = no ] || echo "$program: $*" >&2
 }
 
 ##
 # Usage error: invalid option
 #
 bad_option () {
-    echo "$prog: unrecognized option \`$1'" >&2
-    echo "Try \`$prog --help' for more information." >&2
+    echo "$program: unrecognized option \`$1'" >&2
+    echo "Try \`$program --help' for more information." >&2
     exit 1
 }
 
@@ -118,8 +118,8 @@ bad_option () {
 # Usage error: missing argument
 #
 missing_argument () {
-    echo "$prog: option \`$1' requires an argument" >&2
-    echo "Try \`$prog --help' for more information." >&2
+    echo "$program: option \`$1' requires an argument" >&2
+    echo "Try \`$program --help' for more information." >&2
     exit 1
 }
 
@@ -127,8 +127,8 @@ missing_argument () {
 # Usage error: invalid parameter
 #
 bad_parameter () {
-    echo "$prog: unrecognized parameter \`$1'" >&2
-    echo "Try \`$prog --help' for more information." >&2
+    echo "$program: unrecognized parameter \`$1'" >&2
+    echo "Try \`$program --help' for more information." >&2
     exit 1
 }
 
@@ -136,8 +136,8 @@ bad_parameter () {
 # Usage error: missing parameter
 #
 missing_parameter () {
-    echo "$prog: missing required parameter: $1" >&2
-    echo "Try \`$prog --help' for more information." >&2
+    echo "$program: missing required parameter: $1" >&2
+    echo "Try \`$program --help' for more information." >&2
     exit 1
 }
 
@@ -226,8 +226,8 @@ parse_command_arguments () {
 #
 parse_configuration_file () {
     printf 'configuration_options=()\n'
-    if [ -f "$pkgconfdir/$prog.conf" ] ; then
-        sed '/^[ \t]*\(#\|$\)/d' "$pkgconfdir/$prog.conf" |
+    if [ -f "$pkgconfdir/$program.conf" ] ; then
+        sed '/^[ \t]*\(#\|$\)/d' "$pkgconfdir/$program.conf" |
         while read line ; do
             case $line in
                 *'='*) printf 'configuration_options+=(--%q %q)\n' \
