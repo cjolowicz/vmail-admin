@@ -1,0 +1,5 @@
+version = 3
+server_host = ldapi:///
+search_base = ou=people,dc=%2,dc=%1,ou=vmail,dc=example,dc=com
+query_filter = (uid=%u)
+result_attribute = uid

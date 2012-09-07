@@ -1,0 +1,5 @@
+version = 3
+server_host = ldapi:///
+search_base = ou=vmail,dc=example,dc=com
+query_filter = (o=%s)
+result_attribute = o
