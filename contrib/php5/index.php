@@ -1,5 +1,7 @@
 <?php
 $main_domain = 'example.com';
+$minimum_password_length = 6;
+$minimum_password_nonalpha = 1;
 
 /// Return the domain.
 function get_domain() {
@@ -71,9 +73,35 @@ function ssha($password) {
   return $hash;
 }
 
+/// Check if a password is strong enough.
+function check_password_strength($password) {
+  if (strlen($password) < $minimum_password_length) {
+    throw new Exception(
+      "password must have at least $minimum_password_length characters");
+  }
+
+  $password_nonalpha = preg_replace($password, '[[:alpha:]]+', '');
+
+  if ($password_nonalpha === FALSE) {
+    $error = pcre_last_error();
+    throw new Exception("pcre error ($error)");
+  }
+
+  if (strlen($password_nonalpha) < $minimum_password_nonalpha) {
+    throw new Exception(
+      "password must contain at least $minimum_password_nonalpha " .
+      "non-alphabetical characters");
+  }
+}
+
 /// Change the password of the specified user.
 function change_password($username, $domain, $oldpassword, $password) {
-  $dn = "uid=" . $username . ",ou=people," . get_domain_dn($domain) . ',ou=vmail,' . get_domain_dn($main_domain);
+  check_password_strength($password);
+
+  $dn = "uid=" . $username . ",ou=people,"
+      . get_domain_dn($domain) . ',ou=vmail,'
+      . get_domain_dn($main_domain);
+
   $hash = '{SSHA}' . ssha($password);
   $connection = ldap_connect("127.0.0.1");
 
