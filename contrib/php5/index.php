@@ -1,7 +1,7 @@
 <?php
-$main_domain = 'example.com';
-$minimum_password_length = 6;
-$minimum_password_nonalpha = 1;
+define(MAIN_DOMAIN, 'example.com');
+define(MINIMUM_PASSWORD_LENGTH, 6);
+define(MINIMUM_PASSWORD_NONALPHA, 1);
 
 /// Return the domain.
 function get_domain() {
@@ -21,7 +21,7 @@ function get_domain() {
 
 /// Return the domain DN.
 function get_domain_dn($domain) {
-  $func = function($value) { return 'dc=' . $value; }
+  $func = function($value) { return 'dc=' . $value; };
 
   $domain = explode('.', $domain);
   $domain = array_map($func, $domain);
@@ -75,22 +75,22 @@ function ssha($password) {
 
 /// Check if a password is strong enough.
 function check_password_strength($password) {
-  if (strlen($password) < $minimum_password_length) {
+  if (strlen($password) < MINIMUM_PASSWORD_LENGTH) {
     throw new Exception(
-      "password must have at least $minimum_password_length characters");
+      'password must have at least ' . MINIMUM_PASSWORD_LENGTH . ' characters');
   }
 
-  $password_nonalpha = preg_replace($password, '[[:alpha:]]+', '');
+  $password_nonalpha = preg_replace('/[[:alpha:]]+/', '', $password);
 
-  if ($password_nonalpha === FALSE) {
-    $error = pcre_last_error();
-    throw new Exception("pcre error ($error)");
+  if ($password_nonalpha === NULL) {
+    $error = preg_last_error();
+    throw new Exception("PCRE error ($error)");
   }
 
-  if (strlen($password_nonalpha) < $minimum_password_nonalpha) {
+  if (strlen($password_nonalpha) < MINIMUM_PASSWORD_NONALPHA) {
     throw new Exception(
-      "password must contain at least $minimum_password_nonalpha " .
-      "non-alphabetical characters");
+      'password must contain at least ' . MINIMUM_PASSWORD_NONALPHA .
+      ' non-alphabetical characters');
   }
 }
 
@@ -100,7 +100,7 @@ function change_password($username, $domain, $oldpassword, $password) {
 
   $dn = "uid=" . $username . ",ou=people,"
       . get_domain_dn($domain) . ',ou=vmail,'
-      . get_domain_dn($main_domain);
+      . get_domain_dn(MAIN_DOMAIN);
 
   $hash = '{SSHA}' . ssha($password);
   $connection = ldap_connect("127.0.0.1");
@@ -173,7 +173,7 @@ if ($done) { ?>
   <p class="success">Your password has been changed.</p><?php
 }
 elseif (!empty($error)) { ?>
-  <p class="error">Sorry, <?= htmlspecialchars($error) ?></p><?php
+  <p class="error">Sorry, <?= htmlspecialchars($error) ?>.</p><?php
 } ?>
   <form method="post" action="#" autocomplete="off">
     <fieldset>
