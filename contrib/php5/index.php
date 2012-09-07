@@ -1,7 +1,7 @@
 <?php
-define(MAIN_DOMAIN, 'example.com');
-define(MINIMUM_PASSWORD_LENGTH, 6);
-define(MINIMUM_PASSWORD_NONALPHA, 1);
+define('MAIN_DOMAIN', 'example.com');
+define('MINIMUM_PASSWORD_LENGTH', 6);
+define('MINIMUM_PASSWORD_NONALPHA', 1);
 
 /// Return the domain.
 function get_domain() {
