@@ -570,6 +570,7 @@ do_list_aliases () {
         case $line in
             mail:*)
                 alias=${line#*: }
+                alias=${alias%@*}
                 ;;
 
             mgrpRFC822MailMember:*)
@@ -587,8 +588,8 @@ do_list () {
     eval "$(parse_command_arguments domain "$@")"
     eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
-    ldap_search -b "ou=people,${domain_dn}" -s one 'uid'
-    ldap_search -b "ou=mailGroups,${domain_dn}" -s one 'mail'
+    do_list_users "$@"
+    do_list_aliases "$@" | awk '{print $1}'
 }
 
 ##
@@ -677,7 +678,6 @@ do_add_alias () {
     eval "$(parse_command_arguments alias,users+ "$@")"
 
     domain="${alias##*@}"
-    alias="${alias%@*}"
 
     eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
@@ -780,7 +780,6 @@ do_remove_alias () {
     eval "$(parse_command_arguments "alias,user?" "$@")"
 
     domain="${alias##*@}"
-    alias="${alias%@*}"
 
     eval "$(build_domain_dn "$domain" "$vmail_dn")"
 
