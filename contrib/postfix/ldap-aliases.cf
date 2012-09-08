@@ -1,5 +1,5 @@
 version = 3
-server_host = ldapi:///
+server_host = localhost
 search_base = ou=mailGroups,dc=%2,dc=%1,ou=vmail,dc=example,dc=com
-query_filter = (mail=%u)
+query_filter = (mail=%s)
 result_attribute = mgrpRFC822MailMember

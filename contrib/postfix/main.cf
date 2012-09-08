@@ -1,6 +1,6 @@
 # /etc/postfix/main.conf: `postfix' configuration.
 
-virtual_mailbox_domains = mysql:/etc/postfix/mysql-domains.cf
-virtual_mailbox_maps = mysql:/etc/postfix/mysql-users.cf
-virtual_alias_maps = mysql:/etc/postfix/mysql-aliases.cf,
-                     mysql:/etc/postfix/mysql-users.cf
+virtual_mailbox_domains = ldap:/etc/postfix/ldap-domains.cf
+virtual_mailbox_maps = ldap:/etc/postfix/ldap-users.cf
+virtual_alias_maps = ldap:/etc/postfix/ldap-aliases.cf,
+                     ldap:/etc/postfix/ldap-users.cf
