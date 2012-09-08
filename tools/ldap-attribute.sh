@@ -36,6 +36,7 @@ Usage: $program [options] [name | +name:value | -name:value | -name]..
 options:
 
         --dn DN                DN of the LDAP entry
+    -l, --list                 list the attributes
     -o, --ldap-option OPT      LDAP option
     -n, --dry-run              print commands without executing them
     -v, --verbose              be verbose
@@ -196,6 +197,7 @@ set -- "${configuration_options[@]}" "$@"
 #
 dry_run=no
 verbose=no
+list=false
 ldap_options=("${default_ldap_options[@]}")
 dn=
 while [ $# -gt 0 ] ; do
@@ -227,6 +229,7 @@ while [ $# -gt 0 ] ; do
             shift
             ;;
 
+        -l | --list) list=true ;;
         --) break ;;
         -*) bad_option $option ;;
         *) set -- "$option" "$@" ; break ;;
@@ -281,12 +284,45 @@ ldap_search () {
 }
 
 ##
+# List the attributes.
+#
+do_list_attributes () {
+    eval "$(parse_command_arguments 'dn' "$@")"
+
+    ldap_search -LLL -A -b "$dn" -s base |
+    sed -e '/^dn:/d' -e 's/:$//' -e '/^$/d'
+}
+
+##
+# Resolve line continuations.
+#
+resolve_line_continuations () {
+    record=
+    IFS=
+    while read line ; do
+        case $line in
+            ' '*)
+                record="${record}${line:1}"
+                ;;
+
+            *)
+                [ -z "$record" ] || echo "$record"
+                record="$line"
+                ;;
+        esac
+    done
+
+    [ -z "$record" ] || echo "$record"
+}
+
+##
 # Print an attribute.
 #
 do_print_attribute () {
     eval "$(parse_command_arguments 'dn,name' "$@")"
 
     ldap_search -LLL -b "$dn" -s base "$name" |
+    resolve_line_continuations |
     sed -n s/"^$name: *"//p
 }
 
@@ -334,9 +370,14 @@ ${name}: ${value}
 EOF
 }
 
+if $list ; then
+    do_list_attributes "${dn}"
+    exit 0
+fi
+
 for op ; do
     case $op in
-        +*)
+        +*:*)
 	    op=${op:1}
             do_add_attribute_value "${dn}" "${op%%:*}" "${op#*:}"
             ;;
