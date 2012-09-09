@@ -543,7 +543,7 @@ do_drop_database () {
 do_list_domains () {
     eval "$(parse_command_arguments '' "$@")"
 
-    ldap_search -b "${vmail_dn}" -s sub 'o' |
+    ldap_search -b "${vmail_dn}" -s sub 'o=*.*' 'o' |
     egrep '^o: ' | cut -c4-
 }
 
